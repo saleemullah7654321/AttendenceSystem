@@ -3,7 +3,7 @@ import cv2
 import face_recognition
 from mark_attendence import MarkAttendence
 import os
-from datetime import date, datetime
+import datetime
 
 
 attendence=MarkAttendence()
@@ -12,6 +12,10 @@ class FaceDetectionAndRecognition:
         self.camera = False
         self.mk_dir('static/images')
         self.mk_dir('static/testing_images')
+        self.camera = False
+        self.face_cascade = cv2.CascadeClassifier('./model/haarcascade_frontalface_default.xml')
+
+
 
     def mk_dir(self, dir):
         if not os.path.exists(dir):
@@ -33,9 +37,7 @@ class FaceDetectionAndRecognition:
 
     def generate_frames(self):
         self.use_camera()
-        cam = cv2.VideoCapture(0)
         while True:
-
             success, frame = self.cam.read()
 
             cv2.waitKey(41)
@@ -45,20 +47,18 @@ class FaceDetectionAndRecognition:
                 ret, buffer = cv2.imencode('.jpg', frame)
                 frame = buffer.tobytes()
 
-            face_cascade = cv2.CascadeClassifier('./model/haarcascade_frontalface_default.xml')
             gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-            box,detections = face_cascade.detectMultiScale2(gray,minNeighbors=8)
+            box,detections = self.face_cascade.detectMultiScale2(gray,minNeighbors=8)
             if len(detections)>0 and detections[0]>=50:
                 self.face_rec(frame)
                 x,y,w,h=box[0]
                 cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),1)
-            
             yield(b'--frame\r\n'
                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
     
     def face_rec(self,frame):
-        # ret, buffer = cv2.imencode('.jpg', frame)
-        # frame = buffer.tobytes()
+        ret, buffer = cv2.imencode('.jpg', frame)
+        frame = buffer.tobytes()
         known_img = face_recognition.load_image_file(frame)
         known_img_encoding = face_recognition.face_encodings(known_img)[0]
 
@@ -74,4 +74,4 @@ class FaceDetectionAndRecognition:
 
 
 
-# FaceDetectionAndRecognition().face_rec('./static//testing_images/saleem.jpg')
+FaceDetectionAndRecognition().generate_frames()

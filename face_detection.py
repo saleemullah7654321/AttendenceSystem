@@ -85,7 +85,7 @@ class FaceDetectionAndRecognition:
             img_path = f"images/{i}"
             known_image = face_recognition.load_image_file(img_path)
             if not face_recognition.face_encodings(known_image):
-                return False
+                continue
             biden_encoding = face_recognition.face_encodings(known_image)[0]
             results = face_recognition.compare_faces(
                 [biden_encoding], unknown_encoding, tolerance=0.5)

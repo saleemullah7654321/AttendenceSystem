@@ -1,13 +1,91 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-<body>
-      <div class="container pt-2">
-        <div class="jumbotron p-0 py-1">
-          <h1 align="center">Live Streaming</h1>
+    <title>Attendence</title>
+    <style>
+      html, body {
+        width: 100%;
+        height:100%;
+      }
+      
+      body {
+          background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+          background-size: 400% 400%;
+          animation: gradient 15s ease infinite;
+      }
+      
+      @keyframes gradient {
+          0% {
+              background-position: 0% 50%;
+          }
+          50% {
+              background-position: 100% 50%;
+          }
+          100% {
+              background-position: 0% 50%;
+          }
+      }
+    </style>
+  </head>
+  <body>
+  
+    
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="/">Attendence</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-item nav-link active" href="/admin">Admin</a>
+         
         </div>
-        <center><img src="{% url 'video_feed' %}" width="50%"/><br>
-          <!-- <center><img src="../" width="50%"/><br> -->
       </div>
-</body>
+    </nav>
+       <h1 align="center">Live Streaming</h1> 
+       
+    <center><img src="{% url 'video_feed' %}" width="46%"/><br>
+   
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script type="text/javascript"> 
+      function display_c(){
+      var refresh=1000; // Refresh rate in milli seconds
+      mytime=setTimeout('display_ct()',refresh)
+      }
+      
+      function display_ct() {
+      var x = new Date()
+      document.getElementById('ct').innerHTML = x;
+      display_c();
+       }
+      </script>
+      </head>
+      
+      <body onload=display_ct();>
+      <span id='ct' ></span>
+
+      <div class="container my-20">
+        <footer>
+      </div>
+                </div>
+          </section>
+          <div
+               class="text-center p-3"
+               style="background-color: rgba(0, 0, 0, 0.2)"
+               >
+            © 2020 Copyright:
+            <a class="text-white" href="#"
+               >AttendenceSystem.com</a
+              >
+          </div>
+        </footer>
+      </div>
+  </body>
 </html>

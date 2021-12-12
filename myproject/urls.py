@@ -21,5 +21,7 @@ from app1.models import register
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index),
+    # path('test', views.test),
+    path('attendance', views.attendance),
     path('video_feed', views.video_feed, name='video_feed'),
 ]

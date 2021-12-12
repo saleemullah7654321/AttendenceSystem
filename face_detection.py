@@ -1,25 +1,28 @@
 import cv2
 import face_recognition
+from app1.models import register
 from mark_attendence import MarkAttendence
 import os
-import glob
 from datetime import datetime
-from deepface import DeepFace
 import pymongo
-from pymongo import MongoClient
-from pymongo import collection
-
+import time
+from IPython.core.display import display, HTML
 
 class FaceDetectionAndRecognition:
+    _instance=None
     def __init__(self):
         self.attendence = MarkAttendence()
-        self.dbData = pymongo.MongoClient(
-            "mongodb+srv://talat:mongo@test.wupry.mongodb.net/attendancesystems?retryWrites=true&w=majority")
+        self.all_users=register.objects.all()
+        self.encodings=list(map(lambda x: x.base64_to_numpy,self.all_users))
         self.camera = False
-        self.mk_dir('images')
-        self.mk_dir('testing_images')
+        self.count=0
         self.face_cascade = cv2.CascadeClassifier(
             './model/haarcascade_frontalface_default.xml')
+    #singleton
+    def __new__(self):
+        if not self._instance:
+            self._instance=super(FaceDetectionAndRecognition,self).__new__(self)
+        return self._instance
 
     def mk_dir(self, dir):
         if not os.path.exists(dir):
@@ -40,28 +43,31 @@ class FaceDetectionAndRecognition:
         self.use_camera()
         while True:
             success, frame = self.cam.read()
-            cv2.waitKey(41)
             if not success:
                 break
 
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             box, detections = self.face_cascade.detectMultiScale2(
                 gray, minNeighbors=8)
-            if len(detections) > 0 and detections[0] >= 40:
-                cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 1)
+            if self.count<20:
+                self.count+=1
+            if len(detections) > 0 and detections[0] >= 60 and self.count%20==0:
+                self.count=0
                 res = self.face_rec(frame)
                 if res:
-                    cv2.putText(frame, 'marked', ((x+w)//2, (y+h)//2),
-                                cv2.FONT_HERSHEY_SIMPLEX, 3, [0, 255, 0], 2)
+                    cv2.putText(frame, 'MARKED', ((x+w)//2, (y+h)//2),
+                                cv2.FONT_HERSHEY_SIMPLEX, 1, [0, 255, 0], 2)
+                    # display(HTML('<script>alert("hello")</script>'))
+                    # time.sleep(1)
                 else:
-                    cv2.putText(frame, 'face not found', ((x+w)//2, (y+h)//2),
-                                cv2.FONT_HERSHEY_SIMPLEX, 3, [0, 0, 255], 2)
+                    cv2.putText(frame, 'UNKNOWN', ((x+w)//2, (y+h)//2),
+                                cv2.FONT_HERSHEY_SIMPLEX, 1, [0,0, 255], 2)
+                cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 3)
             elif len(detections) > 0 and detections[0] >= 20:
                 x, y, w, h = box[0]
-                cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 0, 255), 1)
+                cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 0, 255), 3)
                 cv2.putText(frame, str(
-                    detections[0]), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 2, [255], 2)
-            # cv2.imshow('',frame)
+                    detections[0]), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, [255], 2)
             if not success:
                 break
             else:
@@ -71,42 +77,28 @@ class FaceDetectionAndRecognition:
                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
     def face_rec(self, frame):
-        # store best frame as temp image
-        unknown_path = f'./testing_images/1.jpg'
-        cv2.imwrite(unknown_path, frame)
-
-        unknown_image = face_recognition.load_image_file(unknown_path)
-        if not face_recognition.face_encodings(unknown_image):
+        unknown_encoding = face_recognition.face_encodings(frame)
+        if not unknown_encoding:
             return False
-        unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
-
-        # list all images in our local folder set from admin form
-        for i in os.listdir('images'):
-            img_path = f"images/{i}"
-            known_image = face_recognition.load_image_file(img_path)
-            if not face_recognition.face_encodings(known_image):
-                continue
-            biden_encoding = face_recognition.face_encodings(known_image)[0]
-            results = face_recognition.compare_faces(
-                [biden_encoding], unknown_encoding, tolerance=0.5)
-            
-            # if face matched
-            if results[0] == True:
-                time = datetime.now().time().strftime("%H:%M:%S")
-                date = datetime.now().date().strftime("%d/%m/%Y")
-                data = list(self.dbData.attendancesystems.app1_register.find(
-                    {'image': f'images/{i}'}))
-                # check if this image path exist in db
-                if data:
-                    id = data[0]['emp_id']
-                    name = data[0]['name']
-                    self.attendence.insert_attendence(id, name, time, date)
-                    print(id, name, time, date)
-                    return True
-                break
+        unknown_encoding = unknown_encoding[0]
+        results = face_recognition.compare_faces(
+            self.encodings, unknown_encoding, tolerance=0.5)
+        if True in results:
+            _time = datetime.now().time().strftime("%H:%M:%S")
+            date = datetime.now().date().strftime("%d/%m/%Y")
+            idx=results.index(True)
+            id = self.all_users[idx].emp_id
+            name = self.all_users[idx].name
+            self.attendence.insert_attendence(id, name, _time, date)
+            print(id, name, _time, date)
+            return True
         return False
 
 
 # dbData = pymongo.MongoClient("mongodb+srv://talat:mongo@test.wupry.mongodb.net/attendancesystems?retryWrites=true&w=majority")
-# data=list(dbData.attendancesystems.app1_register.find({ 'image':f'images/saleem.jpg'  }))
-# print(data[0]['emp_id'])
+# data=list(dbData.attendancesystems.app1_register.find({'emp_id':4},{'emp_id':1,'image_encoding':1}))[0]
+# print(data)
+# img=face_recognition.load_image_file('./images/saleem.jpg')
+# img_enc=face_recognition.face_encodings(img)
+# face_recognition.compare_faces([str(img_enc)],data['image_encoding'])
+

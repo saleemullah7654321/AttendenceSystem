@@ -1,0 +1,7 @@
+Django
+djongo
+opencv-python
+cmake
+dlib
+face-recognition
+pymongo

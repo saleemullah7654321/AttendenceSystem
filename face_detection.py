@@ -4,9 +4,6 @@ from app1.models import register
 from mark_attendence import MarkAttendence
 import os
 from datetime import datetime
-import pymongo
-import time
-from IPython.core.display import display, HTML
 
 class FaceDetectionAndRecognition:
     _instance=None
@@ -54,20 +51,14 @@ class FaceDetectionAndRecognition:
             if len(detections) > 0 and detections[0] >= 60 and self.count%20==0:
                 self.count=0
                 res = self.face_rec(frame)
-                if res:
-                    cv2.putText(frame, 'MARKED', ((x+w)//2, (y+h)//2),
-                                cv2.FONT_HERSHEY_SIMPLEX, 1, [0, 255, 0], 2)
-                    # display(HTML('<script>alert("hello")</script>'))
-                    # time.sleep(1)
-                else:
-                    cv2.putText(frame, 'UNKNOWN', ((x+w)//2, (y+h)//2),
-                                cv2.FONT_HERSHEY_SIMPLEX, 1, [0,0, 255], 2)
+                cv2.putText(frame, res, ((x+w)//2, (y+h)//2),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, [0, 255, 0], 2)
                 cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 3)
             elif len(detections) > 0 and detections[0] >= 20:
                 x, y, w, h = box[0]
                 cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 0, 255), 3)
                 cv2.putText(frame, str(
-                    detections[0]), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, [255], 2)
+                    detections[0]), (0,30), cv2.FONT_HERSHEY_SIMPLEX, 1, [255], 2)
             if not success:
                 break
             else:
@@ -79,20 +70,20 @@ class FaceDetectionAndRecognition:
     def face_rec(self, frame):
         unknown_encoding = face_recognition.face_encodings(frame)
         if not unknown_encoding:
-            return False
+            return 'Unknown'
         unknown_encoding = unknown_encoding[0]
         results = face_recognition.compare_faces(
             self.encodings, unknown_encoding, tolerance=0.5)
         if True in results:
             _time = datetime.now().time().strftime("%H:%M:%S")
-            date = datetime.now().date().strftime("%d/%m/%Y")
+            date = datetime.now().date().strftime("%Y-%m-%d")
             idx=results.index(True)
             id = self.all_users[idx].emp_id
             name = self.all_users[idx].name
             self.attendence.insert_attendence(id, name, _time, date)
             print(id, name, _time, date)
-            return True
-        return False
+            return name
+        return 'Unknown'
 
 
 # dbData = pymongo.MongoClient("mongodb+srv://talat:mongo@test.wupry.mongodb.net/attendancesystems?retryWrites=true&w=majority")

@@ -1,10 +1,8 @@
-import json
 from django.http.response import StreamingHttpResponse
 from django.shortcuts import render
-from app1.models import register
 from face_detection import FaceDetectionAndRecognition
-from django.core import serializers
 from mark_attendence import MarkAttendence
+from datetime import datetime
 
 attendanceObj=MarkAttendence()
 face_rec=FaceDetectionAndRecognition()
@@ -17,17 +15,20 @@ def index(request):
 
 def attendance(request):
 	face_rec.release_camera()
+	# date=datetime.now().date().strftime("%Y-%m-%d")
+	# all_users=list(attendanceObj.dbData.attendancesystems.app1_attendance.find({"Date":date},{'_id':0}))
 	all_users=list(attendanceObj.dbData.attendancesystems.app1_attendance.find({},{'_id':0}))
 	context= {
-        'person': all_users
+        'person': all_users,
+		# 'date': date
         }
 	return render(request,'attendance.html',context)
 
 
-def test(request):
-	face_rec.release_camera()
-	all_users=register.objects.all()
-	encodings=list(map(lambda x: x.base64_to_numpy,all_users))
-	tmpJson = serializers.serialize("json",all_users)
-	tmpObj = json.loads(tmpJson)
-	return HttpResponse(json.dumps(tmpObj))
+# def test(request):
+# 	face_rec.release_camera()
+# 	all_users=register.objects.all()
+# 	encodings=list(map(lambda x: x.base64_to_numpy,all_users))
+# 	tmpJson = serializers.serialize("json",all_users)
+# 	tmpObj = json.loads(tmpJson)
+# 	return HttpResponse(json.dumps(tmpObj))

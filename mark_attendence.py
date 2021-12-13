@@ -1,16 +1,10 @@
-from numpy.linalg.linalg import lstsq
 import pymongo
-from pymongo import MongoClient
-from pymongo import collection
 from datetime import datetime
-
-from pymongo import results
-from pymongo.message import update
 
 
 class MarkAttendence:
     def __init__(self):
-        self.today_date = datetime.now().date().strftime("%d/%m/%Y")
+        self.today_date = datetime.now().date().strftime("%Y-%m-%d")
         self.dbData = pymongo.MongoClient("mongodb+srv://talat:mongo@test.wupry.mongodb.net/attendancesystems?retryWrites=true&w=majority")
         self.update_data()
 

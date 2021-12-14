@@ -5,3 +5,5 @@ cmake
 dlib
 face-recognition
 pymongo
+pickle5
+pybase64

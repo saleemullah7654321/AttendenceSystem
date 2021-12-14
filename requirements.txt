@@ -7,3 +7,4 @@ face-recognition
 pymongo
 pickle5
 pybase64
+pymongo[srv]

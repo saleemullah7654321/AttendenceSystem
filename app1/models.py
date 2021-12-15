@@ -1,14 +1,17 @@
 from django.core.files import storage
 from django.db import models
 from django.conf import settings
+from django.http import request
 from djongo import models
 from djongo.models.fields import ArrayField
 from djongo.storage import GridFSStorage
 from django.apps import apps
 import face_recognition
 import pymongo
+from pymongo import message
 import pickle5 as pickle
 import pybase64 as base64
+from django.contrib import messages
 
 BASE_URL = "http://127.0.0.1:8000/"
 
@@ -29,8 +32,12 @@ class register(models.Model):
 
     def enc_func(self, img):
         known_image = face_recognition.load_image_file(img)
-        biden_encoding = face_recognition.face_encodings(known_image)[0]
-        return pickle.dumps(biden_encoding)
+        face = face_recognition.face_encodings(known_image)
+        if face:
+            biden_encoding = face[0]     
+            return pickle.dumps(biden_encoding)
+        else:
+            return False         
 
     def save(self, *args, **kwargs):
         np_bytes = self.enc_func(self.image)

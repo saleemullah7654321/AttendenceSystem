@@ -19,6 +19,7 @@ from app1 import views
 from app1.models import register
 
 urlpatterns = [
+    path('myadmin', views.myAdmin),
     path('admin/', admin.site.urls),
     path('', views.index),
     path('attendance', views.attendance),

@@ -1,8 +1,9 @@
-from django.http.response import StreamingHttpResponse
-from django.shortcuts import render
+from django.http.response import HttpResponse, HttpResponseRedirect, StreamingHttpResponse
+from django.shortcuts import redirect, render
 from face_detection import FaceDetectionAndRecognition
 from mark_attendence import MarkAttendence
 from datetime import datetime
+from django.contrib import admin
 
 attendanceObj = MarkAttendence()
 face_rec = FaceDetectionAndRecognition()
@@ -14,6 +15,10 @@ def video_feed(request):
         content_type="multipart/x-mixed-replace; boundary=frame",
     )
 
+
+def myAdmin(request):
+    face_rec.release_camera()
+    return HttpResponseRedirect('admin/')
 
 def index(request):
     global face_rec

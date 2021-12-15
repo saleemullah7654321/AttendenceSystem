@@ -13,6 +13,18 @@ ENV PYTHONUNBUFFERED=1
 COPY requirements.txt .
 RUN python -m pip install -r requirements.txt
 
+
+# RUN  apt-get install python3-pip -y
+RUN python3 -m pip install djongo
+RUN python3 -m pip install opencv-python
+RUN python3 -m pip install cmake
+RUN python3 -m pip install dlib
+RUN python3 -m pip install face-recognition
+RUN python3 -m pip install pymongo
+RUN python3 -m pip install pickle5
+RUN python3 -m pip install pybase64
+RUN python3 -m pip install "pymongo[srv]"
+
 WORKDIR /app
 COPY . /app
 

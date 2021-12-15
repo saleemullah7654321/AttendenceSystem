@@ -40,7 +40,7 @@ class FaceDetectionAndRecognition:
     # open camera for streaming
     def use_camera(self):
         if not self.camera:
-            self.cam = cv2.VideoCapture(0)
+            self.cam = cv2.VideoCapture(0,cv2.CAP_DSHOW)
             self.camera = True
         return self.cam
 

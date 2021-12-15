@@ -16,14 +16,14 @@ on the time of registration which produce 100 time better result than making enc
 make sure python>=3.7 is istalled on your system because it created on 3.7.
 visual studio must install. otherwise it will not work for you. from visual studio 
 installer install Desktop Development with c++.
+Install docker desktop.
 Run this commands from any terminal.
 
 ```bash
   git clone https://github.com/saleemullah7654321/AttendenceSystem.git
   cd AttendenceSystem
   code . // if vs code is installed on your system. otherwise skip this line
-  python -m pip install -r requirements.txt
-  python .\manage.py runserver
+  docker-compose up --build //It will automatically create image with all required configurations and run container for you.
 ```
   after this it start execution, This link http://127.0.0.1:8000/  appears. Goto this
   link you will see output.

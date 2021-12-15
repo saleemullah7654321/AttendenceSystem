@@ -17,13 +17,17 @@ RUN python -m pip install -r requirements.txt
 # RUN  apt-get install python3-pip -y
 RUN python3 -m pip install djongo
 RUN python3 -m pip install opencv-python
-RUN python3 -m pip install cmake
-RUN python3 -m pip install dlib
+RUN apt-get update -y && \
+    apt-get install build-essential cmake pkg-config -y
+
+RUN pip install dlib==19.9.0
 RUN python3 -m pip install face-recognition
 RUN python3 -m pip install pymongo
 RUN python3 -m pip install pickle5
 RUN python3 -m pip install pybase64
 RUN python3 -m pip install "pymongo[srv]"
+RUN apt-get update
+RUN apt-get install ffmpeg libsm6 libxext6  -y
 
 WORKDIR /app
 COPY . /app
@@ -35,4 +39,5 @@ USER appuser
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
 # File wsgi.py was not found in subfolder: 'AttendenceSystem'. Please enter the Python path to wsgi file.
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "pythonPath.to.wsgi"]
+# CMD ["gunicorn", "--bind", "0.0.0.0:8000", "pythonPath.to.wsgi"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

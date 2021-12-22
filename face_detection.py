@@ -40,7 +40,7 @@ class FaceDetectionAndRecognition:
     # open camera for streaming
     def use_camera(self):
         if not self.camera:
-            self.cam = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+            self.cam = cv2.VideoCapture(0)
             self.camera = True
         return self.cam
 
@@ -116,10 +116,3 @@ class FaceDetectionAndRecognition:
             return name
         return "Unknown"
 
-
-# dbData = pymongo.MongoClient("mongodb+srv://talat:mongo@test.wupry.mongodb.net/attendancesystems?retryWrites=true&w=majority")
-# data=list(dbData.attendancesystems.app1_register.find({'emp_id':4},{'emp_id':1,'image_encoding':1}))[0]
-# print(data)
-# img=face_recognition.load_image_file('./images/saleem.jpg')
-# img_enc=face_recognition.face_encodings(img)
-# face_recognition.compare_faces([str(img_enc)],data['image_encoding'])
